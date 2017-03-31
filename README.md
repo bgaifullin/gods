@@ -1,6 +1,6 @@
-# Go Dependencies Snapshot
+# Gover - Go dependencies versions manager
 
-##### gods.yaml
+##### gover.yaml
 
 ```yaml
 name: test
@@ -15,12 +15,12 @@ dependencies:
 ```
 
 commands
-```gods get <dogs.yaml> ```
-```gods list```
-```gods help <command>```
+```gover get <dogs.yaml> ```
+```gover list```
+```gover help <command>```
 
 ## Installation
 
 ```
-go get github.com/bgaifullin/gods && go install
+go get github.com/bgaifullin/gover
 ```
