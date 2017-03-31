@@ -17,7 +17,7 @@ import (
 	"text/template"
 )
 
-const configFileName = "gover.yaml"
+const configFileName = ".gover.yaml"
 
 // A Command is an implementation of a go command
 // like go build or go fix.

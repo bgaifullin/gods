@@ -44,8 +44,8 @@ var vcsGit = &vcsCmd{
 	cmd:  "git",
 
 	createCmd:   "clone {repo} {dir} -b {branch}",
-	downloadCmd: "fetch",
-	checkoutCmd: "checkout {commit}",
+	downloadCmd: "checkout -f tags/{tag}",
+	checkoutCmd: "checkout {version}",
 }
 
 func getVcsByUrl(url string) *vcsCmd {
@@ -53,28 +53,35 @@ func getVcsByUrl(url string) *vcsCmd {
 	return vcsGit
 }
 
+func (v *vcsCmd) parseVersion(version string) (tag, commit string) {
+	if strings.HasPrefix(version, "sha:") {
+		return "master", version[4:]
+	} else {
+		return version, ""
+	}
+}
+
 // create creates a new copy of repo in dir.
 // The parent of dir must exist; dir must not.
 func (v *vcsCmd) create(dir, repo string, version string) error {
-	tag := "master"
-	commit := ""
-	if strings.HasPrefix(version, "sha:") {
-		commit = version[4:]
-	} else {
-		tag = version
-	}
+	tag, commit := v.parseVersion(version)
 	if err := v.run(".", v.createCmd, "dir", dir, "repo", repo, "branch", tag); err != nil {
 		return err
 	}
 	if commit != "" {
-		return v.run(dir, v.checkoutCmd, "commit", commit)
+		return v.run(dir, v.checkoutCmd, "version", commit)
 	}
 	return nil
 }
 
-// download downloads any new changes for the repo in dir.
-func (v *vcsCmd) download(dir string) error {
-	return v.run(dir, v.downloadCmd)
+// checkout switches repository on specified version
+func (v *vcsCmd) checkout(dir string, version string) error {
+	tag, commit := v.parseVersion(version)
+	if commit != "" {
+		return v.run(dir, v.checkoutCmd, "version", commit)
+	} else {
+		return v.run(dir, v.downloadCmd, "tag", tag)
+	}
 }
 
 // run runs the command line cmd in the given directory.

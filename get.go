@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path"
@@ -51,16 +50,20 @@ func runGet(cmd *Command, configs *configsHierarchy, args []string) {
 }
 
 func download(root string, deps []*dependency) error {
+	var err error
 	for _, dep := range deps {
 		dst := path.Join(root, "src", dep.Package)
-		if _, err := os.Stat(dst); err == nil {
-			return fmt.Errorf("package '%s' alredy exists and it is not in index. see gover help fix", dst)
-		}
-		if err := os.MkdirAll(path.Dir(dst), 0755); err != nil {
-			return err
-		}
 		vcs := getVcsByUrl(dep.Url)
-		if err := vcs.create(dst, dep.Url, dep.Version); err != nil {
+		if _, err = os.Stat(dst); err == nil {
+			log.Printf("warning: unmanaged repository '%s'. reset version\n", dst)
+			err = vcs.checkout(dst, dep.Version)
+		} else {
+			log.Printf("create new repository '%s'\n", dst)
+			if err = os.MkdirAll(path.Dir(dst), 0755); err == nil {
+				err = vcs.create(dst, dep.Url, dep.Version)
+			}
+		}
+		if err != nil {
 			return err
 		}
 	}
