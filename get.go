@@ -54,7 +54,7 @@ func download(root string, deps []*dependency) error {
 	for _, dep := range deps {
 		dst := path.Join(root, "src", dep.Package)
 		vcs := getVcsByUrl(dep.Url)
-		if _, err = os.Stat(dst); err == nil {
+		if vcs.exists(dst) {
 			log.Printf("warning: unmanaged repository '%s'. reset version\n", dst)
 			err = vcs.checkout(dst, dep.Version)
 		} else {

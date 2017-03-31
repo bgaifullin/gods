@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 )
 
@@ -16,6 +17,7 @@ import (
 type vcsCmd struct {
 	name string
 	cmd  string // name of binary to invoke command
+	meta string // name of meta directory
 
 	createCmd   string // command to download a fresh copy of a repository
 	downloadCmd string // command to download updates into an existing repository
@@ -42,6 +44,7 @@ func vcsByCmd(cmd string) *vcsCmd {
 var vcsGit = &vcsCmd{
 	name: "Git",
 	cmd:  "git",
+	meta: ".git",
 
 	createCmd:   "clone {repo} {dir} -b {branch}",
 	downloadCmd: "checkout -f tags/{tag}",
@@ -59,6 +62,11 @@ func (v *vcsCmd) parseVersion(version string) (tag, commit string) {
 	} else {
 		return version, ""
 	}
+}
+
+func (v *vcsCmd) exists(dst string) bool {
+	_, err := os.Stat(path.Join(dst, v.meta))
+	return err == nil || !os.IsNotExist(err)
 }
 
 // create creates a new copy of repo in dir.
