@@ -17,7 +17,7 @@ import (
 	"text/template"
 )
 
-const configFileName = "gods.yaml"
+const configFileName = "gover.yaml"
 
 // A Command is an implementation of a go command
 // like go build or go fix.
@@ -97,10 +97,10 @@ func main() {
 
 	for _, p := range filepath.SplitList(gopath) {
 		if strings.HasPrefix(p, "~") {
-			log.Fatalf("gods: GOPATH entry cannot start with shell metacharacter '~': %q\n", p)
+			log.Fatalf("gover: GOPATH entry cannot start with shell metacharacter '~': %q\n", p)
 		}
 		if strings.HasPrefix(p, "./") || strings.HasPrefix(p, "../") {
-			log.Fatalf("gods: GOPATH entry is relative; must be absolute path: %q.\nRun 'go help gopath' for usage.\n", p)
+			log.Fatalf("gover: GOPATH entry is relative; must be absolute path: %q.\nRun 'go help gopath' for usage.\n", p)
 		}
 		cfgfile := path.Join(p, configFileName)
 		if err := configs.Append(cfgfile); err != nil && !os.IsNotExist(err) {
@@ -108,7 +108,7 @@ func main() {
 		}
 	}
 	if configs.Top() == nil {
-		log.Fatalln("gods: cannot load/create config file. please check permissions")
+		log.Fatalln("gover: cannot load/create config file. please check permissions")
 	}
 
 	for _, cmd := range commands {
@@ -125,20 +125,20 @@ func main() {
 		}
 	}
 
-	log.Printf("unknown subcommand %q\nRun 'gods help' for usage.\n", args[0])
+	log.Printf("unknown subcommand %q\nRun 'gover help' for usage.\n", args[0])
 }
 
-var usageTemplate = `gods is a tool for managing go dependencies snapshots.
+var usageTemplate = `gover is a tool for managing go dependencies snapshots.
 Usage:
-	gods command [arguments]
+	gover command [arguments]
 The commands are:
 {{range .}}
     {{.Name | printf "%-11s"}} {{.Short}}
 {{end}}
-Use "gods help [command]" for more information about a command.
+Use "gover help [command]" for more information about a command.
 `
 
-var helpTemplate = `usage: gods {{.UsageLine}}
+var helpTemplate = `usage: gover {{.UsageLine}}
 {{.Long | trim}}
 `
 
@@ -147,7 +147,7 @@ var documentationTemplate = `// Copyright 2017 Bulat Gaifullin. All rights reser
 /*
 {{range .}}{{if .Short}}{{.Short | title}}{{end}}
 Usage:
-	gods {{.UsageLine}}
+	gover {{.UsageLine}}
 {{.Long | trim}}
 {{end}}*/
 package main
@@ -181,7 +181,7 @@ func help(args []string) {
 		return
 	}
 	if len(args) != 1 {
-		fmt.Fprintf(os.Stderr, "usage: gods help command\n\nToo many arguments given.\n")
+		fmt.Fprintf(os.Stderr, "usage: gover help command\n\nToo many arguments given.\n")
 		os.Exit(2) // failed at 'go help'
 	}
 

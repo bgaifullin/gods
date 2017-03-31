@@ -11,7 +11,7 @@ import (
 )
 
 var cmdGet = &Command{
-	UsageLine: "get <gods.yaml>",
+	UsageLine: "get <gover.yaml>",
 	Short:     "download packages",
 	Long:      `Get downloads packages specified in configuration file.`,
 	Run:       runGet,
@@ -54,7 +54,7 @@ func download(root string, deps []*dependency) error {
 	for _, dep := range deps {
 		dst := path.Join(root, "src", dep.Package)
 		if _, err := os.Stat(dst); err == nil {
-			return fmt.Errorf("package '%s' alredy exists and it is not in index. see gods help fix", dst)
+			return fmt.Errorf("package '%s' alredy exists and it is not in index. see gover help fix", dst)
 		}
 		if err := os.MkdirAll(path.Dir(dst), 0755); err != nil {
 			return err

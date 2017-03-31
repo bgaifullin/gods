@@ -113,7 +113,7 @@ func (v *vcsCmd) run1(dir string, cmdline string, keyval []string, verbose bool)
 
 	_, err := exec.LookPath(v.cmd)
 	if err != nil {
-		log.Printf("gods: missing %s command. See http://golang.org/s/gogetcmd\n", v.name)
+		log.Printf("gover: missing %s command. See http://golang.org/s/gogetcmd\n", v.name)
 		return nil, err
 	}
 
