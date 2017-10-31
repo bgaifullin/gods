@@ -4,16 +4,27 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"path"
+	"regexp"
 )
 
 var cmdGet = &Command{
-	UsageLine: "get <gover.yaml>",
+	UsageLine: "get [--exclude REGEXP] <gover.yaml>",
 	Short:     "download packages",
 	Long:      `Get downloads packages specified in configuration file.`,
 	Run:       runGet,
+	Flag:      cmdGetFlags(),
+}
+
+var exclude string
+
+func cmdGetFlags() flag.FlagSet {
+	f := flag.NewFlagSet("get", flag.ContinueOnError)
+	f.StringVar(&exclude, "exclude", "", "regexp for excluding some deps")
+	return *f
 }
 
 func runGet(cmd *Command, configs *configsHierarchy, args []string) {
@@ -30,6 +41,19 @@ func runGet(cmd *Command, configs *configsHierarchy, args []string) {
 		if !configs.Contains(dep) {
 			missing = append(missing, dep)
 		}
+	}
+	if exclude != "" {
+		reg, err := regexp.Compile(exclude)
+		if err != nil {
+			log.Fatal("incorrect 'exclude' parameter")
+		}
+		deps := []*dependency{}
+		for _, dep := range missing {
+			if !reg.MatchString(dep.Package) {
+				deps = append(deps, dep)
+			}
+		}
+		missing = deps
 	}
 	if len(missing) == 0 {
 		log.Println("everithing is up to date")
